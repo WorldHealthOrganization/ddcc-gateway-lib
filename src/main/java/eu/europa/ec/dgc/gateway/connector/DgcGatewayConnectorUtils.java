@@ -2,7 +2,7 @@
  * ---license-start
  * WHO Digital Documentation Covid Certificate Gateway Service / ddcc-gateway-lib
  * ---
- * Copyright (C) 2022 T-Systems International GmbH and all other contributors
+ * Copyright (C) 2022 - 2024 T-Systems International GmbH and all other contributors
  * ---
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -361,11 +361,10 @@ class DgcGatewayConnectorUtils {
     }
 
     private String getHashData(TrustedIssuerDto trustedIssuerDto) {
-        return trustedIssuerDto.getUuid() + HASH_SEPARATOR
-            + trustedIssuerDto.getCountry() + HASH_SEPARATOR
+        return trustedIssuerDto.getCountry() + HASH_SEPARATOR
             + trustedIssuerDto.getName() + HASH_SEPARATOR
             + trustedIssuerDto.getUrl() + HASH_SEPARATOR
-            + trustedIssuerDto.getType().name() + HASH_SEPARATOR;
+            + trustedIssuerDto.getType().name();
     }
 
     @RequiredArgsConstructor

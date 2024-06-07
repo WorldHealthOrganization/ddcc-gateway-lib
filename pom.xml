@@ -6,8 +6,14 @@
 
     <groupId>eu.europa.ec.dgc</groupId>
     <artifactId>ddcc-gateway-lib</artifactId>
-    <version>2.0.2</version>
+    <version>2.1.0</version>
     <packaging>jar</packaging>
+
+    <parent>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-parent</artifactId>
+        <version>2023.0.2</version>
+    </parent>
 
     <name>ddcc-gateway-lib</name>
     <description>Library with common used methods and classes for Digital Documentation Covid Certificate Gateway.
@@ -17,24 +23,21 @@
     </organization>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <!-- charset -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- dependencies -->
-        <owasp.version>9.0.2</owasp.version>
-        <bcpkix.version>1.76</bcpkix.version>
-        <lombok.version>1.18.30</lombok.version>
-        <mapstruct.version>1.5.3.Final</mapstruct.version>
-        <commonsio.version>2.11.0</commonsio.version>
-        <cbor.version>4.5.2</cbor.version>
-        <mockwebserver.version>4.12.0</mockwebserver.version>
-        <plugin.checkstyle.version>3.2.1</plugin.checkstyle.version>
-        <plugin.sonar.version>3.9.1.2184</plugin.sonar.version>
-        <plugin.surefire.version>3.2.2</plugin.surefire.version>
-        <plugin.jacoco.version>0.8.11</plugin.jacoco.version>
-        <spring.boot.version>3.0.13</spring.boot.version>
+        <owasp.version>9.2.0</owasp.version>
+        <bcpkix.version>1.78.1</bcpkix.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <commonsio.version>2.16.1</commonsio.version>
+        <cbor.version>4.5.4</cbor.version>
+        <plugin.checkstyle.version>3.4.0</plugin.checkstyle.version>
+        <plugin.jacoco.version>0.8.12</plugin.jacoco.version>
+<!--        <jackson.version>2.15.4</jackson.version>-->
+<!--        <lombok.version></lombok.version>-->
 
         <!-- license -->
         <license.projectName>WHO Digital Documentation Covid Certificate Gateway Service / ddcc-gateway-lib</license.projectName>
@@ -71,30 +74,23 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${spring.boot.version}</version>
-<!--            <optional>true</optional>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>${spring.boot.version}</version>
-<!--            <optional>true</optional>-->
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
-            <version>4.0.4</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${spring.boot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-httpclient</artifactId>
-            <version>13.1</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -104,7 +100,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -125,17 +120,16 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.3</version>
+            <version>${jackson-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.14.3</version>
+            <version>${jackson-bom.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>mockwebserver</artifactId>
-            <version>${mockwebserver.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -151,17 +145,11 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>${plugin.surefire.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.3.0</version>
+                    <version>2.4.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
@@ -261,6 +249,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
                 <configuration>
                     <annotationProcessorPaths>
                         <path>
@@ -276,7 +265,7 @@
                         <path>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>${spring.boot.version}</version>
+                            <version>${project.parent.parent.version}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
