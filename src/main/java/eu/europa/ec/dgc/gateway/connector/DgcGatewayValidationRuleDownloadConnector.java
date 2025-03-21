@@ -103,7 +103,8 @@ public class DgcGatewayValidationRuleDownloadConnector {
                 validationRules = new ValidationRulesByCountry();
 
                 trustedUploadCertificates =
-                    connectorUtils.fetchCertificatesAndVerifyByTrustAnchor(CertificateTypeDto.UPLOAD, new HashMap<>())
+                    connectorUtils.fetchCertificatesAndVerifyByTrustAnchor(List.of(CertificateTypeDto.UPLOAD),
+                                    new HashMap<>())
                         .stream()
                         .map(connectorUtils::getCertificateFromTrustListItem)
                         .collect(Collectors.toList());
