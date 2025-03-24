@@ -224,7 +224,7 @@ class DgcGatewayConnectorUtils {
     }
 
     public List<TrustListItem> fetchCertificatesAndVerifyByTrustAnchor(
-        CertificateTypeDto type,
+        List<CertificateTypeDto> types,
         HashMap<QueryParameter<? extends Serializable>, List<? extends Serializable>> queryParameterMap)
         throws DgcGatewayConnectorException {
         List<TrustListItemDto> downloadedCertificates;
@@ -234,7 +234,9 @@ class DgcGatewayConnectorUtils {
                 // clone and modify parameter map to only get certs of requested type
                 HashMap<QueryParameter<? extends Serializable>, List<? extends Serializable>> clonedMap =
                     new HashMap<>(queryParameterMap);
-                clonedMap.put(QueryParameter.GROUP, List.of(type.toString()));
+                clonedMap.put(QueryParameter.GROUP, types.stream()
+                        .map(CertificateTypeDto::toString)
+                        .collect(Collectors.toList()));
 
                 ResponseEntity<List<TrustedCertificateTrustListDto>> responseEntity =
                     dgcGatewayConnectorRestClient.downloadTrustedCertificates(convertQueryParams(clonedMap));
@@ -244,21 +246,21 @@ class DgcGatewayConnectorUtils {
 
             } else {
                 ResponseEntity<List<TrustListItemDto>> responseEntity =
-                    dgcGatewayConnectorRestClient.getTrustList(type);
+                    dgcGatewayConnectorRestClient.getTrustList(types.get(0));
                 downloadedCertificates = responseEntity.getBody();
                 responseStatus = responseEntity.getStatusCode();
             }
         } catch (FeignException e) {
-            log.error("Failed to Download certificates from DGC Gateway. Type: {}, status code: {}", type, e.status());
+            log.error("Failed to Download certificates from DGC Gateway. Type: {}, status code: {}", types, e.status());
             throw new DgcGatewayConnectorException(
-                e.status(), "Failed to Download certificates from DGC Gateway of type: " + type.toString());
+                e.status(), "Failed to Download certificates from DGC Gateway of type: " + types.toString());
         }
 
         if (responseStatus != HttpStatus.OK || downloadedCertificates == null) {
             log.error("Failed to Download certificates from DGC Gateway, Type: {}, Status Code: {}",
-                type, responseStatus);
+                types, responseStatus);
             throw new DgcGatewayConnectorException(responseStatus.value(),
-                "Failed to Download certificates from DGC Gateway of type: " + type.toString());
+                "Failed to Download certificates from DGC Gateway of type: " + types.toString());
         }
 
         return downloadedCertificates.stream()

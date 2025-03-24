@@ -233,28 +233,28 @@ public class DgcGatewayDownloadConnector {
             || ChronoUnit.SECONDS.between(lastUpdated, LocalDateTime.now()) >= properties.getMaxCacheAge()) {
             log.info("Maximum age of cache reached. Fetching new TrustList from DGCG.");
 
-            // Fetching CSCA Certs
+            // Fetching CSCA/DECA Certs
             try {
                 trustedCscaTrustList = connectorUtils.fetchCertificatesAndVerifyByTrustAnchor(
-                    CertificateTypeDto.CSCA, queryParameterMap);
+                    List.of(CertificateTypeDto.CSCA, CertificateTypeDto.DECA), queryParameterMap);
                 trustedCscaCertificates = trustedCscaTrustList.stream()
                     .map(connectorUtils::getCertificateFromTrustListItem)
                     .collect(Collectors.toList());
-                log.info("CSCA TrustStore contains {} trusted certificates.", trustedCscaCertificates.size());
+                log.info("CSCA/DECA TrustStore contains {} trusted certificates.", trustedCscaCertificates.size());
                 trustedCscaCertificateMap = trustedCscaCertificates.stream()
                     .collect(Collectors.groupingBy(ca -> ca.getSubject().toString(),
                         Collectors.mapping(ca -> ca, Collectors.toList())));
 
                 // Fetching Upload Certs
                 trustedUploadCertificateTrustList = connectorUtils.fetchCertificatesAndVerifyByTrustAnchor(
-                    CertificateTypeDto.UPLOAD, queryParameterMap);
+                    List.of(CertificateTypeDto.UPLOAD), queryParameterMap);
                 trustedUploadCertificates = trustedUploadCertificateTrustList.stream()
                     .map(connectorUtils::getCertificateFromTrustListItem)
                     .collect(Collectors.toList());
                 log.info("Upload TrustStore contains {} trusted certificates.", trustedUploadCertificates.size());
 
                 fetchTrustListAndVerifyByCscaAndUpload();
-                log.info("DSC TrustStore contains {} trusted certificates.", trustedCertificates.size());
+                log.info("DSC/DESC TrustStore contains {} trusted certificates.", trustedCertificates.size());
 
                 if (properties.isEnableDdccSupport()) {
                     // Fetching TrustedCertificates
@@ -289,7 +289,7 @@ public class DgcGatewayDownloadConnector {
                 // clone and modify parameter map to only get certs of requested type
                 HashMap<QueryParameter<? extends Serializable>, List<? extends Serializable>> clonedMap =
                     new HashMap<>(queryParameterMap);
-                clonedMap.put(QueryParameter.GROUP, List.of("DSC"));
+                clonedMap.put(QueryParameter.GROUP, List.of("DSC", "DESC"));
 
                 ResponseEntity<List<TrustedCertificateTrustListDto>> responseEntity =
                     dgcGatewayConnectorRestClient.downloadTrustedCertificates(

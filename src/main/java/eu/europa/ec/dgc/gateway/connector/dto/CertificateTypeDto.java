@@ -26,5 +26,7 @@ public enum CertificateTypeDto {
     UPLOAD,
     CSCA,
     DSC,
+    DECA,
+    DESC,
     TRUSTANCHOR
 }
