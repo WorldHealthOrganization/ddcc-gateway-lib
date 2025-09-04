@@ -379,7 +379,7 @@ public class DgcGatewayDownloadConnector {
                             dcs.getNotAfter().toInstant(), ZoneId.systemDefault()
                     );
                     if (LocalDateTime.now().isAfter(validUntil)) {
-                        log.error("invalid certificate. KID: {}, Country: {}",
+                        log.error("certificate is expired for KID: {}, Country: {}",
                                 certificate.getKid(), certificate.getCountry());
                         return false;
                     }
