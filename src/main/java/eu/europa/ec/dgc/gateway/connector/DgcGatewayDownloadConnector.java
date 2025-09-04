@@ -35,15 +35,19 @@ import eu.europa.ec.dgc.gateway.connector.model.TrustedReference;
 import eu.europa.ec.dgc.signing.SignedCertificateMessageParser;
 import feign.FeignException;
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
 import java.io.Serializable;
 import java.security.Security;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -101,6 +105,16 @@ public class DgcGatewayDownloadConnector {
 
     private final HashMap<QueryParameter<? extends Serializable>, List<? extends Serializable>> queryParameterMap =
         new HashMap<>();
+
+    private Predicate<X509CertificateHolder> isCertExpired() {
+        return cert -> {
+            LocalDateTime now = LocalDateTime.now(ZoneId.systemDefault());
+            LocalDateTime validUntil = LocalDateTime.ofInstant(
+                    cert.getNotAfter().toInstant(), ZoneId.systemDefault()
+            );
+            return !now.isAfter(validUntil);
+        };
+    }
 
     @PostConstruct
     void init() {
@@ -242,6 +256,7 @@ public class DgcGatewayDownloadConnector {
                     .collect(Collectors.toList());
                 log.info("CSCA/DECA TrustStore contains {} trusted certificates.", trustedCscaCertificates.size());
                 trustedCscaCertificateMap = trustedCscaCertificates.stream()
+                    .filter(isCertExpired())
                     .collect(Collectors.groupingBy(ca -> ca.getSubject().toString(),
                         Collectors.mapping(ca -> ca, Collectors.toList())));
 
@@ -352,7 +367,26 @@ public class DgcGatewayDownloadConnector {
         }
 
         ddccTrustedCertificates = responseEntity.getBody().stream()
-            .filter(cert -> (connectorUtils.checkTrustAnchorSignature(cert)
+                .filter(cert -> {
+                    var certificate = trustedCertificateMapper.mapToTrustList(cert);
+                    X509CertificateHolder dcs = null;
+                    try {
+                        dcs = new X509CertificateHolder(Base64.getDecoder().decode(certificate.getRawData()));
+                    } catch (IOException e) {
+                        return false;
+                    }
+                    LocalDateTime validUntil = LocalDateTime.ofInstant(
+                            dcs.getNotAfter().toInstant(), ZoneId.systemDefault()
+                    );
+                    if (LocalDateTime.now().isAfter(validUntil)) {
+                        log.error("invalid certificate. KID: {}, Country: {}",
+                                certificate.getKid(), certificate.getCountry());
+                        return false;
+                    }
+
+                    return true;
+                })
+                .filter(cert -> (connectorUtils.checkTrustAnchorSignature(cert)
                 || (checkCscaCertificate(cert) && checkUploadCertificate(cert))))
             .map(trustedCertificateMapper::map)
             .collect(Collectors.toList());
