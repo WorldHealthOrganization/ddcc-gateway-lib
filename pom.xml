@@ -30,7 +30,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- dependencies -->
         <owasp.version>12.1.0</owasp.version>
-        <bcpkix.version>1.81</bcpkix.version>
+        <bcpkix.version>1.84</bcpkix.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <commonsio.version>2.16.1</commonsio.version>
         <cbor.version>4.5.4</cbor.version>
