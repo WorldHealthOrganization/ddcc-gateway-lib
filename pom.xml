@@ -34,6 +34,7 @@
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <commonsio.version>2.16.1</commonsio.version>
         <cbor.version>4.5.4</cbor.version>
+        <ld-signatures-java.version>1.11.0</ld-signatures-java.version>
         <plugin.checkstyle.version>3.4.0</plugin.checkstyle.version>
         <plugin.jacoco.version>0.8.12</plugin.jacoco.version>
 <!--        <jackson.version>2.15.4</jackson.version>-->
@@ -69,6 +70,12 @@
             <url>https://maven.pkg.github.com/${github.organization}/${github.project}</url>
         </repository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>danubetech</id>
+            <url>https://repo.danubetech.com/repository/maven-public/</url>
+        </repository>
+    </repositories>
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -161,6 +168,11 @@
             <groupId>com.upokecenter</groupId>
             <artifactId>cbor</artifactId>
             <version>${cbor.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>info.weboftrust</groupId>
+            <artifactId>ld-signatures-java</artifactId>
+            <version>${ld-signatures-java.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
